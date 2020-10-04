@@ -10,6 +10,7 @@ default-run = "cryptopals"
 [dependencies]
 data-encoding = "2.3.0"
 maplit = "1.0.2"
+lazy_static = "1.4.0"
 
 [[bin]]
 name = "cryptopals"
