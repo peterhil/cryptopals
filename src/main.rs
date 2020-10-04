@@ -1,6 +1,7 @@
 #![warn(clippy::all, rust_2018_idioms)]
 
 use data_encoding::{BASE64, HEXLOWER};
+use statrs::statistics::Statistics;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
@@ -8,6 +9,7 @@ use cryptopals::ascii;
 use cryptopals::encoding;
 use cryptopals::stat::character;
 use cryptopals::string;
+use cryptopals::types;
 use cryptopals::xor;
 
 fn ch1() {
@@ -62,7 +64,7 @@ fn ch3() {
     // - Only consider union of letters freqs in english and message (maybe normalise)
     let english_set: HashSet<char> = character::ENGLISH.keys().copied().collect();
     let frequency_set: HashSet<char> = frequencies.keys().copied().collect();
-    let common = frequency_set.intersection(&english_set).collect::<Vec<&char>>();
+    let common = frequency_set.intersection(&english_set).copied().collect::<Vec<char>>();
 
     println!("Common characters: {:?}", common);
     println!("Frequencies:");
@@ -75,13 +77,14 @@ fn ch3() {
 
     println!("L2 diffs:");
     for ch in &common {
-        let l2_diff: f64 = (frequencies.get(ch).unwrap() - character::ENGLISH.get(ch).unwrap()).powi(2);
-        l2_differences.insert(**ch, l2_diff);
+        let l2_diff: f64 = (frequencies.get(&ch).unwrap() - character::ENGLISH.get(&ch).unwrap()).powi(2);
+        l2_differences.insert(*ch, l2_diff);
         println!("{}: {:?}", ch, l2_diff);
     }
 
     // - Calculate median or mean
-    println!("Sum of diffs: {:?}", l2_differences.values().sum::<f64>())
+    println!("Sum of diffs: {:?}", l2_differences.values().sum::<f64>());
+    println!("Mean of diffs: {:?}", l2_differences.values().mean());
 }
 
 fn main() {
