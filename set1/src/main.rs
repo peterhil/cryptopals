@@ -29,11 +29,11 @@ fn xor_buffers(v1: Vec<u8>, v2: Vec<u8>) -> Vec<u8> {
 }
 
 fn ch2() {
-    let hex1 = b"1c0111001f010100061a024b53535009181c";
-    let hex2 = b"686974207468652062756c6c277320657965";
+    let hex1 = b"1c0111001f010100061a024b53535009181c".to_vec();
+    let hex2 = b"686974207468652062756c6c277320657965".to_vec();
     let expected = "746865206b696420646f6e277420706c6179";
 
-    let v3 = HEXLOWER.encode(&xor_buffers(hex_decode(hex1.to_vec()), hex_decode(hex2.to_vec())).to_vec());
+    let v3 = HEXLOWER.encode(&xor_buffers(hex_decode(hex1), hex_decode(hex2)).to_vec());
     assert_eq!(&v3[..], &expected[..]);
 
     println!("Ch2 result: {:?}", v3);
