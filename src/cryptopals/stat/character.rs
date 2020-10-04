@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::collections::btree_map::BTreeMap;
 
 lazy_static! {
-    static ref ENGLISH: HashMap<char, f64> = hashmap!{
+    pub static ref ENGLISH: HashMap<char, f64> = hashmap!{
         'a' => 0.08167,
         'b' => 0.01492,
         'c' => 0.02782,

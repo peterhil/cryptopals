@@ -1,9 +1,13 @@
 #![warn(clippy::all, rust_2018_idioms)]
 
 use data_encoding::{BASE64, HEXLOWER};
+use std::collections::HashMap;
+use std::collections::HashSet;
 
 use cryptopals::ascii;
 use cryptopals::encoding;
+use cryptopals::stat::character;
+use cryptopals::string;
 use cryptopals::xor;
 
 fn ch1() {
@@ -33,23 +37,51 @@ fn ch2() {
 
 fn ch3() {
     let secret = b"1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
-    let letters = b"v\nD \x1a\x17\x05vETAOINSHRDLUCMFWYPVBGKQJXZ etaoinshrdlucmfwypvbgkqjxz0123456789@!\"#$%&/()+{}[]=,.-;:_\\|'*^~";  // English letter frequency order
+    let _letters = b"v\nD \x1a\x17\x05vETAOINSHRDLUCMFWYPVBGKQJXZ etaoinshrdlucmfwypvbgkqjxz0123456789@!\"#$%&/()+{}[]=,.-;:_\\|'*^~";  // English letter frequency order
+
+    let decoded = &xor::xor_char(secret.to_vec(), b'z');
+    println!("Ch3: {:?}\n{:?}\n{:?}", &decoded, BASE64.encode(&decoded), ascii::print(decoded.to_vec()));
+
+    // letters
+    //     .iter()
+    //     .for_each(|&chr| {
+    //         let decoded = &xor::xor_char(secret.to_vec(), chr);
+    //         println!("{}: {:?}", ascii::printable(chr as char), ascii::print(decoded.to_vec()));
+    //     })
 
     // Use letter frequency of decoded as a metric and choose the best one
-    // - Get letter frequencies (lowercase the message!)
+
+    // - Get letter frequency counts (lowercase the message!)
+    let s = string::from_vec(decoded.to_vec()).to_lowercase();
+
+    // types::print_type_of(&*decoded);
+    println!("Decoded: {:?}", s);
+
+    let frequencies = character::frequencies(character::counts(s));
+
     // - Only consider union of letters freqs in english and message (maybe normalise)
-    // - Do Least squares on each letter
+    let english_set: HashSet<char> = character::ENGLISH.keys().copied().collect();
+    let frequency_set: HashSet<char> = frequencies.keys().copied().collect();
+    let common = frequency_set.intersection(&english_set).collect::<Vec<&char>>();
+
+    println!("Common characters: {:?}", common);
+    println!("Frequencies:");
+    for ch in &common {
+        println!("{}: {:?}", ch, frequencies.get(ch).unwrap());
+    }
+
+    // - Do least squares on difference of each letter frequency
+    let mut l2_differences: HashMap<char, f64> = HashMap::new();
+
+    println!("L2 diffs:");
+    for ch in &common {
+        let l2_diff: f64 = (frequencies.get(ch).unwrap() - character::ENGLISH.get(ch).unwrap()).powi(2);
+        l2_differences.insert(**ch, l2_diff);
+        println!("{}: {:?}", ch, l2_diff);
+    }
+
     // - Calculate median or mean
-
-    // let decoded = &xor::xor_char(secret.to_vec(), b'z');
-    // println!("Ch3: {:?}\n{:?}\n{:?}", &decoded, BASE64.encode(&decoded), ascii::print(decoded.to_vec()));
-
-    letters
-        .iter()
-        .for_each(|&chr| {
-            let decoded = &xor::xor_char(secret.to_vec(), chr);
-            println!("{}: {:?}", ascii::printable(chr as char), ascii::print(decoded.to_vec()));
-        })
+    println!("Sum of diffs: {:?}", l2_differences.values().sum::<f64>())
 }
 
 fn main() {
