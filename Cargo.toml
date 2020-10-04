@@ -3,8 +3,18 @@ name = "cryptopals"
 version = "0.1.0"
 authors = ["Peter Hillerström <peter.hillerstrom@gmail.com>"]
 edition = "2018"
+default-run = "cryptopals"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 data-encoding = "2.3.0"
+maplit = "1.0.2"
+
+[[bin]]
+name = "cryptopals"
+path = "src/main.rs"
+
+[[bin]]
+name = "letter_frequencies"
+path = "src/bin/letter_frequencies.rs"
