@@ -39,6 +39,7 @@ dependencies = [
  "data-encoding",
  "lazy_static",
  "maplit",
+ "ordered-float",
  "statrs",
 ]
 
@@ -158,6 +159,15 @@ checksum = "ac267bcc07f48ee5f8935ab0d24f316fb722d7a1292e2913f0cc196b29ffd611"
 dependencies = [
  "autocfg",
  "libm",
+]
+
+[[package]]
+name = "ordered-float"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9fe9037165d7023b1228bc4ae9a2fa1a2b0095eca6c2998c624723dfd01314a5"
+dependencies = [
+ "num-traits",
 ]
 
 [[package]]
