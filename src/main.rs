@@ -33,18 +33,16 @@ fn ch2() {
     let hex2 = b"686974207468652062756c6c277320657965".to_vec();
     let expected = "746865206b696420646f6e277420706c6179";
 
-    let v3 = HEXLOWER.encode(&xor::xor_buffers(encoding::hex_decode(hex1), encoding::hex_decode(hex2)).to_vec());
+    let v3 = HEXLOWER.encode(&xor::xor_buffers(&encoding::hex_decode(hex1), &encoding::hex_decode(hex2)).to_vec());
     assert_eq!(&v3[..], &expected[..]);
 
     println!("Ch2 result: {:?}", v3);
 }
 
 // Use letter frequency of text as a metric and return a metric of likeness to English text
-fn englishness(text: &Vec<u8>) -> f64 {
-    // - Get letter frequency counts (lowercase the message!)
-    let s = string::from_vec(text.to_vec()).to_lowercase();
-
-    let frequencies = character::frequencies(character::counts(s));
+fn englishness(text: &String) -> f64 {
+    // - Get letter frequency counts
+    let frequencies = character::frequencies(character::counts(text));
 
     // - Only consider union of letters freqs in english and message (maybe normalise)
     let english_set: HashSet<char> = character::ENGLISH.keys().copied().collect();
@@ -89,9 +87,15 @@ fn ch3() {
     letters
         .iter()
         .for_each(|&letter| {
-            let decoded = &xor::xor_char(secret, letter);
+            let decoded = &xor::xor_char(&secret, letter);
             // println!("{}:\t{:?}", ascii::printable_escape(letter as char), string::from_vec(decoded.to_vec()));
-            let metric = englishness(decoded);
+
+            // Convert Vec<u8> to String and lowercase the message
+            let text = string::from_vec(decoded.to_vec()).to_lowercase();
+            // let text: String = String::from_utf8(decoded.to_vec()).or_else(|err| Ok(String::from(""))).unwrap().to_lowercase();
+            // let text = String::from_utf8(decoded.to_vec()).or_else::<dyn Fn() -> String>(|err| return Ok(String::from(""))).unwrap();
+
+            let metric = englishness(&text);
             metrics.entry(OrderedFloat::<f64>::from(metric)).or_insert(vec![]).append(&mut vec!(letter as char));
             println!("{}\t{}\t{:?}", ascii::printable_escape(letter as char), metric, ascii::print(decoded.to_vec()));
 

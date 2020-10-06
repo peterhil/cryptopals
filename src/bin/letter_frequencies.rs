@@ -19,7 +19,7 @@ fn char_statistics() {
         .read_to_string(&mut buf)
         .unwrap_or_else(|e| exit_err(e, 3));
 
-    let count = character::counts(buf);
+    let count = character::counts(&buf);
 
     println!("Number of occurences per character");
     for (ch, count) in &count {

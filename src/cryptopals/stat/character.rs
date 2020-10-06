@@ -36,7 +36,7 @@ lazy_static! {
     };
 }
 
-pub fn counts(buf: String) -> BTreeMap<char, i64> {
+pub fn counts(buf: &String) -> BTreeMap<char, i64> {
     let mut count = BTreeMap::new();
 
     for c in buf.chars() {
