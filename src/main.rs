@@ -10,7 +10,6 @@ use std::collections::HashSet;
 use cryptopals::ascii;
 use cryptopals::encoding;
 use cryptopals::stat::character;
-use cryptopals::string;
 // use cryptopals::types;
 use cryptopals::xor;
 
@@ -83,18 +82,19 @@ fn ch3() {
         .for_each(|&letter| {
             let decoded = &xor::xor_char(&secret, letter);
 
-            // Convert Vec<u8> to String and lowercase the message
-            let text = string::from_vec(decoded.to_vec()).to_lowercase();
-            // let text: String = String::from_utf8(decoded.to_vec()).or_else(|err| Ok(String::from(""))).unwrap().to_lowercase();
-            // let text = String::from_utf8(decoded.to_vec()).or_else::<dyn Fn() -> String>(|err| return Ok(String::from(""))).unwrap();
+            // Convert to string, lowercase the message and calculate metric
+            match String::from_utf8(decoded.to_vec()) {
+                Ok(text) => {
+                    let metric = englishness(&text.to_lowercase());
+                    metrics
+                        .entry(OrderedFloat::<f64>::from(metric))
+                        .or_insert(vec![])
+                        .append(&mut vec!(letter as char));
 
-            let metric = englishness(&text);
-            metrics
-                .entry(OrderedFloat::<f64>::from(metric))
-                .or_insert(vec![])
-                .append(&mut vec!(letter as char));
-
-            println!("{}\t{}\t{:?}", ascii::printable_escape(letter as char), metric, ascii::print(decoded.to_vec()));
+                    println!("{}\t{}\t{:?}", ascii::printable_escape(letter as char), metric, ascii::print(decoded.to_vec()));
+                },
+                Err(_) => (),
+            }
         });
 
     // Get minimum element of BTreeMap: https://stackoverflow.com/a/58951038/470560
