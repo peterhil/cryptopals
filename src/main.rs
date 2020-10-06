@@ -13,7 +13,7 @@ use cryptopals::stat::character;
 // use cryptopals::types;
 use cryptopals::xor;
 
-fn ch1() {
+fn ch1() -> String {
     let hex = b"49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
     let bytes = b"I'm killing your brain like a poisonous mushroom";
     let expected = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
@@ -24,10 +24,10 @@ fn ch1() {
     let encoded = BASE64.encode(&decoded);
     assert_eq!(&encoded[..], &expected[..]);
 
-    println!("Base64 encoded message: {:?}", encoded);
+    return encoded;
 }
 
-fn ch2() {
+fn ch2() -> String {
     let hex1 = b"1c0111001f010100061a024b53535009181c".to_vec();
     let hex2 = b"686974207468652062756c6c277320657965".to_vec();
     let expected = "746865206b696420646f6e277420706c6179";
@@ -35,7 +35,7 @@ fn ch2() {
     let v3 = HEXLOWER.encode(&xor::xor_buffers(&encoding::hex_decode(hex1), &encoding::hex_decode(hex2)).to_vec());
     assert_eq!(&v3[..], &expected[..]);
 
-    println!("Ch2 result: {:?}", v3);
+    return v3;
 }
 
 // Use letter frequency of text as a metric and return a metric of likeness to English text
@@ -74,9 +74,8 @@ fn ch3() {
     let hex = b"1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
     let secret: Vec<u8> = encoding::hex_decode(hex.to_vec());
     let letters: Vec<u8> = (0..=255).collect::<Vec<u8>>();
-    let mut metrics: BTreeMap<OrderedFloat<f64>, Vec<char>> = BTreeMap::new();
+    let mut metrics: BTreeMap<OrderedFloat<f64>, BTreeMap<char, Vec<u8>>> = BTreeMap::new();
 
-    println!("Ch3:");
     letters
         .iter()
         .for_each(|&letter| {
@@ -88,23 +87,25 @@ fn ch3() {
                     let metric = englishness(&text.to_lowercase());
                     metrics
                         .entry(OrderedFloat::<f64>::from(metric))
-                        .or_insert(vec![])
-                        .append(&mut vec!(letter as char));
-
-                    println!("{}\t{:.1}\t{:?}", ascii::printable_escape(letter as char), metric, ascii::print(decoded.to_vec()));
+                        .or_insert(BTreeMap::new())
+                        .insert(letter as char, decoded.to_vec());
                 },
                 Err(_) => (),
             }
         });
 
     // Get minimum element of BTreeMap: https://stackoverflow.com/a/58951038/470560
-    if let Some((minimum, chars)) = metrics.iter().next_back() {
-        println!("Probably encoded with {:?}: {}", chars, minimum);
+    if let Some((minimum, decodings)) = metrics.iter().next_back() {
+        println!("Probably encoded with {:?}: {:.1}", decodings.keys().copied().collect::<Vec<char>>(), minimum);
+        for (letter, decoding) in decodings {
+            println!("{}\t{:?}", ascii::printable_escape(*letter as char), ascii::print(decoding.to_vec()));
+        }
     }
 }
 
 fn main() {
-    ch1();
-    ch2();
+    println!("Ch1: Base64 encoded message: {:?}", ch1());
+    println!("Ch2: Result: {:?}", ch2());
+    println!("Ch3:");
     ch3();
 }
