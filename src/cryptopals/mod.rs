@@ -1,8 +1,8 @@
-pub use self::ascii::{print, printable};
-pub use self::encoding::hex_decode;
-pub use self::stat::character::{counts, frequencies};
-pub use self::types::print_type_of;
-pub use self::xor::xor_buffers;
+pub use self::ascii::*;
+pub use self::encoding::*;
+pub use self::stat::*;
+pub use self::types::*;
+pub use self::xor::*;
 
 pub mod ascii;
 pub mod encoding;

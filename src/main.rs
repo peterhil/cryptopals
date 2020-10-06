@@ -3,13 +3,10 @@
 use data_encoding::{BASE64, HEXLOWER};
 use ordered_float::OrderedFloat;
 use std::collections::BTreeMap;
-use std::collections::HashMap;
-use std::collections::HashSet;
 
 use cryptopals::ascii;
 use cryptopals::encoding;
-use cryptopals::stat::character;
-// use cryptopals::types;
+use cryptopals::stat::text;
 use cryptopals::xor;
 
 fn ch1() -> String {
@@ -37,28 +34,6 @@ fn ch2() -> String {
     return v3;
 }
 
-// Use letter frequency of text as a metric and return a metric of likeness to English text
-fn englishness(text: &String) -> f64 {
-    let frequencies = character::frequencies(character::counts(text));
-
-    // - Only consider union of letters freqs in english and message
-    let english_set: HashSet<char> = character::ENGLISH.keys().copied().collect();
-    let frequency_set: HashSet<char> = frequencies.keys().copied().collect();
-    let common = english_set.intersection(&frequency_set).copied().collect::<Vec<char>>();
-
-    // - Do least squares on difference of each letter frequency
-    let mut l2_differences: HashMap<char, f64> = HashMap::new();
-    for ch in &common {
-        let l2_diff: f64 = (character::ENGLISH.get(&ch).unwrap() - frequencies.get(&ch).unwrap()).powi(2);
-        l2_differences.insert(*ch, l2_diff);
-    }
-
-    // - Calculate metric
-    let metric: f64 = -l2_differences.values().product::<f64>().log2();
-
-    return metric;
-}
-
 fn ch3() {
     let hex = b"1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
     let secret: Vec<u8> = encoding::hex_decode(hex.to_vec());
@@ -73,7 +48,7 @@ fn ch3() {
             // Convert to string, lowercase the message and calculate metric
             match String::from_utf8(decoded.to_vec()) {
                 Ok(text) => {
-                    let metric = englishness(&text.to_lowercase());
+                    let metric = text::englishness(&text.to_lowercase());
                     metrics
                         .entry(OrderedFloat::<f64>::from(metric))
                         .or_insert(BTreeMap::new())
