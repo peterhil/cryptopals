@@ -2,7 +2,6 @@
 
 use data_encoding::{BASE64, HEXLOWER};
 use ordered_float::OrderedFloat;
-// use statrs::statistics::Statistics;
 use std::collections::BTreeMap;
 use std::collections::HashMap;
 use std::collections::HashSet;
@@ -47,12 +46,6 @@ fn englishness(text: &String) -> f64 {
     let frequency_set: HashSet<char> = frequencies.keys().copied().collect();
     let common = english_set.intersection(&frequency_set).copied().collect::<Vec<char>>();
 
-    // println!("Common characters: {:?}", common);
-    // println!("Frequencies:");
-    // for ch in &common {
-    //     println!("{}: {:?}", ch, frequencies.get(ch).unwrap());
-    // }
-
     // - Do least squares on difference of each letter frequency
     let mut l2_differences: HashMap<char, f64> = HashMap::new();
     for ch in &common {
@@ -61,13 +54,9 @@ fn englishness(text: &String) -> f64 {
     }
 
     // - Calculate metric
-    // let _l2_sum = l2_differences.values().sum::<f64>();
-    // let _l2_mean = l2_differences.values().mean();
-    let l2_product: f64 = l2_differences.values().product();
-    // println!("Sum of diffs: {:?}", l2_sum);
-    // println!("Mean of diffs: {:?}", l2_mean);
+    let metric: f64 = -l2_differences.values().product::<f64>().log2();
 
-    return -l2_product.log2();
+    return metric;
 }
 
 fn ch3() {
