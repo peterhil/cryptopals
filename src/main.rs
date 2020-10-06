@@ -41,10 +41,9 @@ fn ch2() {
 
 // Use letter frequency of text as a metric and return a metric of likeness to English text
 fn englishness(text: &String) -> f64 {
-    // - Get letter frequency counts
     let frequencies = character::frequencies(character::counts(text));
 
-    // - Only consider union of letters freqs in english and message (maybe normalise)
+    // - Only consider union of letters freqs in english and message
     let english_set: HashSet<char> = character::ENGLISH.keys().copied().collect();
     let frequency_set: HashSet<char> = frequencies.keys().copied().collect();
     let common = english_set.intersection(&frequency_set).copied().collect::<Vec<char>>();
@@ -57,15 +56,12 @@ fn englishness(text: &String) -> f64 {
 
     // - Do least squares on difference of each letter frequency
     let mut l2_differences: HashMap<char, f64> = HashMap::new();
-
-    // println!("L2 diffs:");
     for ch in &common {
         let l2_diff: f64 = (character::ENGLISH.get(&ch).unwrap() - frequencies.get(&ch).unwrap()).powi(2);
         l2_differences.insert(*ch, l2_diff);
-        // println!("{}: {:?}", ch, l2_diff);
     }
 
-    // - Calculate median or mean
+    // - Calculate metric
     // let _l2_sum = l2_differences.values().sum::<f64>();
     // let _l2_mean = l2_differences.values().mean();
     let l2_product: f64 = l2_differences.values().product();
@@ -79,16 +75,14 @@ fn ch3() {
     let hex = b"1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
     let secret: Vec<u8> = encoding::hex_decode(hex.to_vec());
     let letters: Vec<u8> = (0..=255).collect::<Vec<u8>>();
-    // let letters = b"WZ\x80xX".to_vec();
+    let mut metrics: BTreeMap<OrderedFloat<f64>, Vec<char>> = BTreeMap::new();
 
     println!("Ch3:");
 
-    let mut metrics: BTreeMap<OrderedFloat<f64>, Vec<char>> = BTreeMap::new();
     letters
         .iter()
         .for_each(|&letter| {
             let decoded = &xor::xor_char(&secret, letter);
-            // println!("{}:\t{:?}", ascii::printable_escape(letter as char), string::from_vec(decoded.to_vec()));
 
             // Convert Vec<u8> to String and lowercase the message
             let text = string::from_vec(decoded.to_vec()).to_lowercase();
@@ -98,9 +92,6 @@ fn ch3() {
             let metric = englishness(&text);
             metrics.entry(OrderedFloat::<f64>::from(metric)).or_insert(vec![]).append(&mut vec!(letter as char));
             println!("{}\t{}\t{:?}", ascii::printable_escape(letter as char), metric, ascii::print(decoded.to_vec()));
-
-            // let decoded = &xor::xor_char(secret.to_vec(), chr);
-            // println!("{}: {:?}", ascii::printable(letter as char), ascii::print(decoded.to_vec()));
         });
 
     // Get minimum element of BTreeMap: https://stackoverflow.com/a/58951038/470560
