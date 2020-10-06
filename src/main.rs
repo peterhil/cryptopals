@@ -1,12 +1,9 @@
 #![warn(clippy::all, rust_2018_idioms)]
 
 use data_encoding::{BASE64, HEXLOWER};
-use ordered_float::OrderedFloat;
-use std::collections::BTreeMap;
 
 use cryptopals::ascii;
 use cryptopals::encoding;
-use cryptopals::stat::text;
 use cryptopals::xor;
 
 fn ch1() -> String {
@@ -34,43 +31,14 @@ fn ch2() -> String {
     return v3;
 }
 
-pub fn metrics(secret: &Vec<u8>, letters: &Vec<u8>) -> BTreeMap<OrderedFloat<f64>, BTreeMap<char, Vec<u8>>> {
-    let mut metrics = BTreeMap::new();
-
-    letters
-        .iter()
-        .for_each(|&letter| {
-            let decoded = &xor::xor_char(secret, letter);
-
-            // Convert to string, lowercase the message and calculate metric
-            match String::from_utf8(decoded.to_vec()) {
-                Ok(text) => {
-                    let metric = text::englishness(&text.to_lowercase());
-                    metrics
-                        .entry(OrderedFloat::<f64>::from(metric))
-                        .or_insert(BTreeMap::new())
-                        .insert(letter as char, decoded.to_vec());
-                },
-                Err(_) => (),
-            }
-        });
-
-    return metrics;
-}
-
 fn ch3() {
     let hex = b"1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
     let secret: Vec<u8> = encoding::hex_decode(hex.to_vec());
-    let letters: Vec<u8> = (0..=255).collect::<Vec<u8>>();
-    let metrics = metrics(&secret, &letters);
 
-    // Get minimum element of BTreeMap: https://stackoverflow.com/a/58951038/470560
-    if let Some((minimum, decodings)) = metrics.iter().next_back() {
-        println!("Probably encoded with {:?}: {:.1}", decodings.keys().copied().collect::<Vec<char>>(), minimum);
-        for (letter, decoding) in decodings {
-            println!("{}\t{:?}", ascii::printable_escape(*letter as char), ascii::print(decoding.to_vec()));
-        }
-    }
+    println!("Hex: {:?}", ascii::print(hex.to_vec()));
+    println!("Secret: {:?}", ascii::print(secret.to_vec()));
+
+    xor::decrypt_single_byte(secret);
 }
 
 fn main() {
