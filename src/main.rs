@@ -67,7 +67,7 @@ fn englishness(text: &String) -> f64 {
     // println!("Sum of diffs: {:?}", l2_sum);
     // println!("Mean of diffs: {:?}", l2_mean);
 
-    return l2_product;
+    return -l2_product.log2();
 }
 
 fn ch3() {
@@ -91,14 +91,14 @@ fn ch3() {
                         .or_insert(vec![])
                         .append(&mut vec!(letter as char));
 
-                    println!("{}\t{}\t{:?}", ascii::printable_escape(letter as char), metric, ascii::print(decoded.to_vec()));
+                    println!("{}\t{:.1}\t{:?}", ascii::printable_escape(letter as char), metric, ascii::print(decoded.to_vec()));
                 },
                 Err(_) => (),
             }
         });
 
     // Get minimum element of BTreeMap: https://stackoverflow.com/a/58951038/470560
-    if let Some((minimum, chars)) = metrics.iter().next() {
+    if let Some((minimum, chars)) = metrics.iter().next_back() {
         println!("Probably encoded with {:?}: {}", chars, minimum);
     }
 }
