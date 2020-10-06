@@ -12,7 +12,6 @@ data-encoding = "2.3.0"
 lazy_static = "1.4.0"
 maplit = "1.0.2"
 ordered-float = "2.0.0"
-statrs = "0.13.0"
 
 [[bin]]
 name = "cryptopals"
