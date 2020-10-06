@@ -78,7 +78,6 @@ fn ch3() {
     let mut metrics: BTreeMap<OrderedFloat<f64>, Vec<char>> = BTreeMap::new();
 
     println!("Ch3:");
-
     letters
         .iter()
         .for_each(|&letter| {
@@ -90,7 +89,11 @@ fn ch3() {
             // let text = String::from_utf8(decoded.to_vec()).or_else::<dyn Fn() -> String>(|err| return Ok(String::from(""))).unwrap();
 
             let metric = englishness(&text);
-            metrics.entry(OrderedFloat::<f64>::from(metric)).or_insert(vec![]).append(&mut vec!(letter as char));
+            metrics
+                .entry(OrderedFloat::<f64>::from(metric))
+                .or_insert(vec![])
+                .append(&mut vec!(letter as char));
+
             println!("{}\t{}\t{:?}", ascii::printable_escape(letter as char), metric, ascii::print(decoded.to_vec()));
         });
 
