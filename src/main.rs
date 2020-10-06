@@ -79,7 +79,7 @@ fn englishness(text: &Vec<u8>) -> f64 {
 
 fn ch3() {
     let hex = b"1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
-    let secret = encoding::hex_decode(hex.to_vec());
+    let secret: Vec<u8> = encoding::hex_decode(hex.to_vec());
     let letters: Vec<u8> = (0..=255).collect::<Vec<u8>>();
     // let letters = b"WZ\x80xX".to_vec();
 
@@ -89,7 +89,7 @@ fn ch3() {
     letters
         .iter()
         .for_each(|&letter| {
-            let decoded = &xor::xor_char(secret.to_vec(), letter);
+            let decoded = &xor::xor_char(secret, letter);
             // println!("{}:\t{:?}", ascii::printable_escape(letter as char), string::from_vec(decoded.to_vec()));
             let metric = englishness(decoded);
             metrics.entry(OrderedFloat::<f64>::from(metric)).or_insert(vec![]).append(&mut vec!(letter as char));
