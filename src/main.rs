@@ -1,7 +1,9 @@
 #![warn(clippy::all, rust_2018_idioms)]
 
 use data_encoding::{BASE64, HEXLOWER};
-use statrs::statistics::Statistics;
+use ordered_float::OrderedFloat;
+// use statrs::statistics::Statistics;
+use std::collections::BTreeMap;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
@@ -47,7 +49,7 @@ fn englishness(text: &Vec<u8>) -> f64 {
     // - Only consider union of letters freqs in english and message (maybe normalise)
     let english_set: HashSet<char> = character::ENGLISH.keys().copied().collect();
     let frequency_set: HashSet<char> = frequencies.keys().copied().collect();
-    let common = frequency_set.intersection(&english_set).copied().collect::<Vec<char>>();
+    let common = english_set.intersection(&frequency_set).copied().collect::<Vec<char>>();
 
     // println!("Common characters: {:?}", common);
     // println!("Frequencies:");
@@ -60,38 +62,47 @@ fn englishness(text: &Vec<u8>) -> f64 {
 
     // println!("L2 diffs:");
     for ch in &common {
-        let l2_diff: f64 = (frequencies.get(&ch).unwrap() - character::ENGLISH.get(&ch).unwrap()).powi(2);
+        let l2_diff: f64 = (character::ENGLISH.get(&ch).unwrap() - frequencies.get(&ch).unwrap()).powi(2);
         l2_differences.insert(*ch, l2_diff);
         // println!("{}: {:?}", ch, l2_diff);
     }
 
     // - Calculate median or mean
-    let _l2_sum = l2_differences.values().sum::<f64>();
-    let l2_mean = l2_differences.values().mean();
+    // let _l2_sum = l2_differences.values().sum::<f64>();
+    // let _l2_mean = l2_differences.values().mean();
+    let l2_product: f64 = l2_differences.values().product();
     // println!("Sum of diffs: {:?}", l2_sum);
     // println!("Mean of diffs: {:?}", l2_mean);
 
-    return l2_mean;
+    return l2_product;
 }
 
 fn ch3() {
-    let secret = b"1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
-    // let _letters = b"v\nD \x1a\x17\x05vETAOINSHRDLUCMFWYPVBGKQJXZ etaoinshrdlucmfwypvbgkqjxz0123456789@!\"#$%&/()+{}[]=,.-;:_\\|'*^~";  // English letter frequency order
+    let hex = b"1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
+    let secret = encoding::hex_decode(hex.to_vec());
     let letters: Vec<u8> = (0..=255).collect::<Vec<u8>>();
+    // let letters = b"WZ\x80xX".to_vec();
 
     println!("Ch3:");
+
+    let mut metrics: BTreeMap<OrderedFloat<f64>, Vec<char>> = BTreeMap::new();
     letters
         .iter()
         .for_each(|&letter| {
             let decoded = &xor::xor_char(secret.to_vec(), letter);
+            // println!("{}:\t{:?}", ascii::printable_escape(letter as char), string::from_vec(decoded.to_vec()));
             let metric = englishness(decoded);
+            metrics.entry(OrderedFloat::<f64>::from(metric)).or_insert(vec![]).append(&mut vec!(letter as char));
             println!("{}\t{}\t{:?}", ascii::printable_escape(letter as char), metric, ascii::print(decoded.to_vec()));
-            // println!("{}: {:?}", ascii::printable(letter as char), ascii::print(decoded.to_vec()));
-            // println!("Metric: {}\n", metric);
 
             // let decoded = &xor::xor_char(secret.to_vec(), chr);
             // println!("{}: {:?}", ascii::printable(letter as char), ascii::print(decoded.to_vec()));
-        })
+        });
+
+    // Get minimum element of BTreeMap: https://stackoverflow.com/a/58951038/470560
+    if let Some((minimum, chars)) = metrics.iter().next() {
+        println!("Probably encoded with {:?}: {}", chars, minimum);
+    }
 }
 
 fn main() {
