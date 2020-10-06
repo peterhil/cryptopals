@@ -4,6 +4,7 @@ use data_encoding::{BASE64, HEXLOWER};
 
 use cryptopals::ascii;
 use cryptopals::encoding;
+use cryptopals::io::{read_lines};
 use cryptopals::xor;
 
 fn ch1() -> String {
@@ -41,9 +42,29 @@ fn ch3() {
     xor::decrypt_single_byte(secret);
 }
 
+fn ch4() {
+    // File must exist in current path before this produces output
+    let filename = "./data/4.txt";
+    match read_lines(filename) {
+        Ok(lines) => {
+            // Consumes the iterator, returns an (Optional) String
+            for line in lines {
+                if let Ok(ip) = line {
+                    println!("{}", ip);
+                }
+            }
+        },
+        Err(err) => {
+            println!("Error: {:?}", err);
+        }
+    }
+}
+
 fn main() {
     println!("Ch1: Base64 encoded message: {:?}", ch1());
     println!("Ch2: Result: {:?}", ch2());
     println!("Ch3:");
     ch3();
+    println!("Ch4:");
+    ch4();
 }
