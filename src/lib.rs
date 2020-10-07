@@ -5,9 +5,9 @@ extern crate lazy_static;
 
 mod cryptopals;
 
-pub use cryptopals::ascii;
-pub use cryptopals::encoding;
-pub use cryptopals::io;
-pub use cryptopals::stat;
-pub use cryptopals::types;
-pub use cryptopals::xor;
+pub use crate::cryptopals::ascii;
+pub use crate::cryptopals::encoding;
+pub use crate::cryptopals::io;
+pub use crate::cryptopals::stat;
+pub use crate::cryptopals::types;
+pub use crate::cryptopals::xor;
