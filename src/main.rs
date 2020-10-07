@@ -1,6 +1,8 @@
 #![warn(clippy::all, rust_2018_idioms)]
 
 use data_encoding::{BASE64, HEXLOWER};
+use relative_path::RelativePath;
+use std::env;
 
 use cryptopals::ascii;
 use cryptopals::encoding;
@@ -42,22 +44,28 @@ fn ch3() {
     xor::decrypt_single_byte(secret);
 }
 
-fn ch4() {
+fn ch4() -> Result<String, std::io::Error> {
     // File must exist in current path before this produces output
-    let filename = "./data/4.txt";
-    match read_lines(filename) {
+    let relative_path = RelativePath::new("./data/4.txt");
+    let full_path = relative_path.to_path(env::current_dir()?.as_path());
+
+    match read_lines(full_path) {
         Ok(lines) => {
             // Consumes the iterator, returns an (Optional) String
             for line in lines {
-                if let Ok(ip) = line {
-                    println!("{}", ip);
+                if let Ok(hex) = line {
+                    println!("{}", hex);
+                    let secret = encoding::hex_decode(Vec::<u8>::from(hex));
+                    xor::decrypt_single_byte(secret);
                 }
             }
         },
         Err(err) => {
             println!("Error: {:?}", err);
-        }
+        },
     }
+
+    return Ok("Done!".to_string());
 }
 
 fn main() {
@@ -66,5 +74,6 @@ fn main() {
     println!("Ch3:");
     ch3();
     println!("Ch4:");
-    ch4();
+    let res = ch4();
+    println!("{}", res.unwrap())  // TODO Fix type of ch4;
 }

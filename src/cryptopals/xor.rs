@@ -51,10 +51,12 @@ pub fn decrypt_single_byte(secret: Vec<u8>) {
 
     // Get minimum element of BTreeMap: https://stackoverflow.com/a/58951038/470560
     if let Some((minimum, decodings)) = metrics.iter().next_back() {
-        println!("Probably encoded with {:?}: {:.1}", decodings.keys().copied().collect::<Vec<char>>(), minimum);
-        for (letter, decoding) in decodings {
-            println!("{}\t{:?}", ascii::printable_escape(*letter as char), ascii::print(decoding.to_vec()));
+        if minimum.into_inner() > 160.0f64 {
+            println!("Probably encoded with {:?}: {:.1}", decodings.keys().copied().collect::<Vec<char>>(), minimum);
+            for (letter, decoding) in decodings {
+                println!("{}\t{:?}", ascii::printable_escape(*letter as char), ascii::print(decoding.to_vec()));
+            }
+            println!("---");
         }
     }
-    println!("---");
 }
