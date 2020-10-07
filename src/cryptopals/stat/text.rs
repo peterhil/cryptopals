@@ -2,7 +2,9 @@
 
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::iter::Sum;
 
+use crate::cryptopals::xor;
 use super::character;
 
 // Use letter frequency of text as a metric and return a metric of likeness to English text
@@ -25,4 +27,26 @@ pub fn englishness(text: &String) -> f64 {
     let metric: f64 = -l2_differences.values().product::<f64>().log2();
 
     return metric;
+}
+
+pub fn hamming_distance(a: Vec<u8>, b: Vec<u8>) -> u64 {
+    return xor::xor_buffers(&a, &b).iter()
+        .map(|c| c.count_ones() as u64)
+        .sum::<u64>();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    mod hamming_distance {
+        use super::*;
+
+        #[test]
+        fn gives_37() {
+            let a: Vec<u8> = b"this is a test".to_vec();
+            let b: Vec<u8> = b"wokka wokka!!!".to_vec();
+            assert_eq!(37, hamming_distance(a, b));
+        }
+    }
 }
