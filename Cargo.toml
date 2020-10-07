@@ -15,9 +15,23 @@ ordered-float = "2.0.0"
 relative-path = "1.3.2"
 
 [[bin]]
-name = "cryptopals"
-path = "src/main.rs"
-
-[[bin]]
 name = "letter_frequencies"
 path = "src/bin/letter_frequencies.rs"
+
+# Set 1
+
+[[bin]]
+name = "s1c1"
+path = "src/bin/set1/ch1.rs"
+
+[[bin]]
+name = "s1c2"
+path = "src/bin/set1/ch2.rs"
+
+[[bin]]
+name = "s1c3"
+path = "src/bin/set1/ch3.rs"
+
+[[bin]]
+name = "s1c4"
+path = "src/bin/set1/ch4.rs"
