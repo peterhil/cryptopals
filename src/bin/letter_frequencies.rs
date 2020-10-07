@@ -1,11 +1,11 @@
 // https://rosettacode.org/wiki/Letter_frequency#Rust
 
-use std::{env, process};
-use std::io::{self, Read, Write};
-use std::fmt::Display;
 use std::fs::File;
+use std::io::{Read};
+use std::{env};
 
 use cryptopals::stat::character;
+use cryptopals::io::{exit_err};
 
 fn char_statistics() {
     let filename = env::args().nth(1)
@@ -31,12 +31,6 @@ fn char_statistics() {
     for (ch, freq) in &frequencies {
         println!("{:?}: {}", ch, freq);
     }
-}
-
-#[inline]
-fn exit_err<T>(msg: T, code: i32) -> ! where T: Display {
-    writeln!(&mut io::stderr(), "{}", msg).expect("Could not write to stderr");
-    process::exit(code)
 }
 
 fn main() {
