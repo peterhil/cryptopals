@@ -2,15 +2,8 @@
 
 use std::env;
 
-use cryptopals::encoding;
 use cryptopals::io::{exit_err, read_lines};
 use cryptopals::xor;
-
-fn decrypt(hex: String) {
-    // println!("{}", hex);
-    let secret = encoding::hex_decode(Vec::<u8>::from(hex));
-    xor::decrypt_single_byte(secret);
-}
 
 fn ch4() {
     let full_path = env::args().nth(1)
@@ -22,7 +15,7 @@ fn ch4() {
             // Consumes the iterator, returns an (Optional) String
             for line in lines {
                 if let Ok(hex) = line {
-                    decrypt(hex);
+                    xor::decrypt_single_byte(&hex);
                 }
             }
         },

@@ -4,8 +4,8 @@ use data_encoding::HEXLOWER;
 use ordered_float::OrderedFloat;
 use std::collections::BTreeMap;
 
-use crate::cryptopals::stat::text;
 use crate::cryptopals::ascii;
+use crate::cryptopals::stat::text;
 
 pub fn xor_buffers(v1: &Vec<u8>, v2: &Vec<u8>) -> Vec<u8> {
     return v1
@@ -46,9 +46,12 @@ pub fn metrics(secret: &Vec<u8>, letters: &Vec<u8>) -> BTreeMap<OrderedFloat<f64
     return metrics;
 }
 
-pub fn decrypt_single_byte(secret: Vec<u8>) {
+pub fn decrypt_single_byte(hex: &String) {
+    let secret: Vec<u8> = HEXLOWER.decode(&Vec::<u8>::from(&hex[..])).unwrap();
     let letters: Vec<u8> = (0..=255).collect::<Vec<u8>>();
     let metrics = metrics(&secret, &letters);
+
+    println!("{}", &hex);
 
     // Get minimum element of BTreeMap: https://stackoverflow.com/a/58951038/470560
     if let Some((metric, decodings)) = metrics.iter().next_back() {
