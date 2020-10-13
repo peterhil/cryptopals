@@ -1,5 +1,6 @@
 #![allow(unused_variables)]
 
+use data_encoding::HEXLOWER;
 use ordered_float::OrderedFloat;
 use std::collections::BTreeMap;
 
@@ -59,4 +60,18 @@ pub fn decrypt_single_byte(secret: Vec<u8>) {
             println!("---");
         }
     }
+}
+
+pub fn encrypt_repeated(plaintext: &str, key: &str) -> String {
+    let count: usize = (plaintext.len() as f64 / key.len() as f64).ceil() as usize;
+    let repeated = &key.repeat(count)[..plaintext.len()];
+    println!("{}", plaintext);
+
+    let encoded: Vec<u8> = xor_buffers(
+        &plaintext.as_bytes().to_vec(),
+        &repeated.as_bytes().to_vec()
+    );
+    let hex = HEXLOWER.encode(&encoded);
+
+    return hex;
 }
