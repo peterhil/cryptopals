@@ -1,6 +1,8 @@
 #![warn(clippy::all, rust_2018_idioms)]
 
 use data_encoding::{BASE64, HEXLOWER};
+use ordered_float::OrderedFloat;
+use std::collections::{BTreeMap, BTreeSet};
 
 use cryptopals::ascii;
 use cryptopals::stat::text;
@@ -18,7 +20,7 @@ fn edit_distance_metric(s1: Vec<u8>, s2: Vec<u8>) -> f64 {
     return metric;
 }
 
-fn guess_keysize(secret: Vec<u8>, keysize: usize) -> f64 {
+fn try_keysize(secret: Vec<u8>, keysize: usize) -> f64 {
     let mut chunks = secret.chunks(keysize).take(2);
     let s1 = chunks.next().unwrap();
     let s2 = chunks.next().unwrap();
@@ -28,19 +30,36 @@ fn guess_keysize(secret: Vec<u8>, keysize: usize) -> f64 {
     return metric;
 }
 
-fn ch6() {
-    // let secret: Vec<u8> = BASE64.decode(b"HUIfTQsPAh9PE048GmllH0kcDk4TAQsHThsBFkU2AB4BSWQgVB0dQzNTTmVS").unwrap();
-    // let plaintext = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
-    // let key = "ICE";
-    // let secret: Vec<u8> = xor::encrypt_repeated(plaintext, key);
-    let secret = b"ICEICE Burning 'em, if you ain't quick and nimble";
-    let keysizes = (2..=15).collect::<Vec<usize>>();
+fn guess_keysize(secret: &Vec<u8>, max_keysize: usize) ->
+    BTreeMap<OrderedFloat<f64>, BTreeSet<usize>>
+{
+    let keysizes = (2..=max_keysize).collect::<Vec<usize>>();
+    let mut metrics = BTreeMap::new();
 
     for keysize in keysizes {
-
-        let metric = guess_keysize(secret.to_vec(), keysize);
+        let metric = try_keysize(secret.to_vec(), keysize);
         println!("Keysize: {}, metric: {}", keysize, metric);
         println!();
+
+        metrics
+            .entry(OrderedFloat::<f64>::from(metric))
+            .or_insert(BTreeSet::new())
+            .insert(keysize);
+    }
+
+    return metrics;
+}
+
+fn ch6() {
+    // let secret: Vec<u8> = BASE64.decode(b"HUIfTQsPAh9PE048GmllH0kcDk4TAQsHThsBFkU2AB4BSWQgVB0dQzNTTmVS").unwrap();
+    let plaintext = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
+    let key = "ICE";
+    let secret: Vec<u8> = xor::encrypt_repeated(plaintext, key);
+    // let secret: Vec<u8> = b"ICEICE Burning 'em, if you ain't quick and nimble".to_vec();
+
+    let metrics = guess_keysize(&secret, 15);
+    if let Some((metric, sizes)) = metrics.iter().next() {
+        println!("Probable keysizes: {:?} with metric {:?}", sizes, metric);
     }
 }
 
