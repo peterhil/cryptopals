@@ -70,20 +70,20 @@ fn guess_keysize(secret: &Vec<u8>, max_keysize: usize) ->
     return metrics;
 }
 
-fn ch6() {
-    // let secret: Vec<u8> = BASE64.decode(b"HUIfTQsPAh9PE048GmllH0kcDk4TAQsHThsBFkU2AB4BSWQgVB0dQzNTTmVS").unwrap();
-    let plaintext = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
-    let key = "ICE";
-    let secret: Vec<u8> = xor::encrypt_repeated(plaintext, key);
-    // let secret: Vec<u8> = b"ICEICE Burning 'em, if you ain't quick and nimble".to_vec();
-
+fn ch6(secret: Vec<u8>) {
     let metrics = guess_keysize(&secret, 40);
     if let Some((metric, sizes)) = metrics.iter().next() {
-        println!("Probable keysizes: {:?} with metric {:?}", sizes, metric);
+        println!("Probable keysizes: {:?} with metric {:?}", sizes, metric.into_inner());
     }
 }
 
 fn main() {
+    let plaintext = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
+    let key = "ICE";
+    let secret: Vec<u8> = xor::encrypt_repeated(plaintext, key);
+    // let secret: Vec<u8> = BASE64.decode(b"HUIfTQsPAh9PE048GmllH0kcDk4TAQsHThsBFkU2AB4BSWQgVB0dQzNTTmVS").unwrap();
+    // let secret: Vec<u8> = b"ICEICE Burning 'em, if you ain't quick and nimble".to_vec();
+
     println!("Ch6:");
-    ch6();
+    ch6(secret);
 }
