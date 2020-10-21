@@ -1,11 +1,14 @@
 #![warn(clippy::all, rust_2018_idioms)]
 
+use data_encoding::BASE64;
 use ordered_float::OrderedFloat;
 use std::collections::{BTreeMap, BTreeSet};
+use std::env;
 
 use cryptopals::ascii;
+use cryptopals::io::{exit_err, read_lines};
 use cryptopals::stat::text;
-use cryptopals::xor;
+// use cryptopals::xor;
 
 fn edit_distance_metric(s1: Vec<u8>, s2: Vec<u8>) -> f64 {
     // assert_eq!(s1.len(), s2.len(), "Arguments must be the same length!");
@@ -70,6 +73,32 @@ fn guess_keysize(secret: &Vec<u8>, max_keysize: usize) ->
     return metrics;
 }
 
+fn read_bytes() -> Vec<u8> {
+    let full_path = env::args().nth(1)
+        .ok_or(format!("Usage: {} data/6.txt", env::args().nth(0).unwrap()))
+        .unwrap_or_else(|e| exit_err(e, 1));
+    let mut contents = vec![];
+
+    match read_lines(full_path) {
+        Ok(lines) => {
+            // Consumes the iterator, returns an (Optional) String
+            for line in lines {
+                if let Ok(base64) = line {
+                    let mut decoded = BASE64
+                        .decode(&base64.as_bytes()[..])
+                        .unwrap_or_else(|e| exit_err(e, 2));
+                    contents.append(&mut decoded);
+                }
+            }
+        },
+        Err(err) => {
+            println!("Error: {:?}", err);
+        },
+    }
+
+    return contents;
+}
+
 fn ch6(secret: Vec<u8>) {
     let metrics = guess_keysize(&secret, 40);
     if let Some((metric, sizes)) = metrics.iter().next() {
@@ -78,11 +107,12 @@ fn ch6(secret: Vec<u8>) {
 }
 
 fn main() {
-    let plaintext = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
-    let key = "ICE";
-    let secret: Vec<u8> = xor::encrypt_repeated(plaintext, key);
+    // let plaintext = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
+    // let key = "ICE";
+    // let secret: Vec<u8> = xor::encrypt_repeated(plaintext, key);
     // let secret: Vec<u8> = BASE64.decode(b"HUIfTQsPAh9PE048GmllH0kcDk4TAQsHThsBFkU2AB4BSWQgVB0dQzNTTmVS").unwrap();
     // let secret: Vec<u8> = b"ICEICE Burning 'em, if you ain't quick and nimble".to_vec();
+    let secret = read_bytes();
 
     println!("Ch6:");
     ch6(secret);
