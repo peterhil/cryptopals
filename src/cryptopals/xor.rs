@@ -46,21 +46,21 @@ pub fn metrics(secret: &Vec<u8>, letters: &Vec<u8>) -> BTreeMap<OrderedFloat<f64
     return metrics;
 }
 
-pub fn decrypt_single_byte(hex: &String) {
-    let secret: Vec<u8> = HEXLOWER.decode(&Vec::<u8>::from(&hex[..])).unwrap();
+pub fn decrypt_single_byte(secret: &Vec<u8>) -> Option<u8> {
     let letters: Vec<u8> = (0..=255).collect::<Vec<u8>>();
     let metrics = metrics(&secret, &letters);
 
-    println!("{}", &hex);
-
     // Get minimum element of BTreeMap: https://stackoverflow.com/a/58951038/470560
     if let Some((metric, decodings)) = metrics.iter().next_back() {
-        if metric.into_inner() > 160.0f64 {
-            println!("Probably encoded with {:?}: {:.1}", decodings.keys().copied().collect::<Vec<char>>(), metric);
+        println!(">>> {}", HEXLOWER.encode(&secret));
+        let keys = decodings.keys().copied().collect::<Vec<char>>();
+        if metric.into_inner() > 0.0f64 {
+            println!("--- Probably encoded with {:?}: {:.1}", &keys, metric);
             for (letter, decoding) in decodings {
                 println!("{}\t{:?}", ascii::printable_escape(*letter as char), ascii::print(decoding.to_vec()));
             }
-            println!("---");
+            println!();
+            return Some(*keys.first().unwrap() as u8);
         }
     }
 }

@@ -1,5 +1,6 @@
 #![warn(clippy::all, rust_2018_idioms)]
 
+use data_encoding::HEXLOWER;
 use std::env;
 
 use cryptopals::io::{exit_err, read_lines};
@@ -15,7 +16,8 @@ fn ch4() {
             // Consumes the iterator, returns an (Optional) String
             for line in lines {
                 if let Ok(hex) = line {
-                    xor::decrypt_single_byte(&hex);
+                    let secret = HEXLOWER.decode(hex.as_bytes()).unwrap();
+                    xor::decrypt_single_byte(&secret);
                 }
             }
         },
