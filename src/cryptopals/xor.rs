@@ -46,25 +46,35 @@ pub fn metrics(secret: &Vec<u8>, letters: &Vec<u8>) -> BTreeMap<OrderedFloat<f64
     return metrics;
 }
 
-pub fn decrypt_single_byte(secret: &Vec<u8>) -> Option<u8> {
+fn print_metric(metric: &OrderedFloat<f64>, keys: &Vec<char>, decodings: &BTreeMap<char, Vec<u8>>) {
+    println!("--- Probably encoded with {:?}: {:.1}", &keys, metric);
+    for (letter, decoding) in decodings {
+        println!("{}\t{:?}", ascii::printable_escape(*letter as char), ascii::print(decoding.to_vec()));
+    }
+    println!();
+}
+
+pub fn decrypt_single_byte(secret: &Vec<u8>, count: usize) -> Vec<char> {
     let letters: Vec<u8> = (0..=255).collect::<Vec<u8>>();
     let metrics = metrics(&secret, &letters);
+    let mut metrics_iter = metrics.iter().filter(|(metric, _)| metric.into_inner() > 0.0f64);
+    let mut probable_keys = vec![];
 
-    // Get minimum element of BTreeMap: https://stackoverflow.com/a/58951038/470560
-    if let Some((metric, decodings)) = metrics.iter().next_back() {
+    if &metrics.len() > &0 {
         println!(">>> {}", HEXLOWER.encode(&secret));
-        let keys = decodings.keys().copied().collect::<Vec<char>>();
-        if metric.into_inner() > 0.0f64 {
-            println!("--- Probably encoded with {:?}: {:.1}", &keys, metric);
-            for (letter, decoding) in decodings {
-                println!("{}\t{:?}", ascii::printable_escape(*letter as char), ascii::print(decoding.to_vec()));
-            }
-            println!();
-            return Some(*keys.first().unwrap() as u8);
+    }
+
+    for _ in 0..count {
+        // Get minimum element of BTreeMap: https://stackoverflow.com/a/58951038/470560
+        if let Some((metric, decodings)) = metrics_iter.next_back() {
+            let mut keys = decodings.keys().copied().collect::<Vec<char>>();
+
+            print_metric(&metric, &keys, &decodings);
+            probable_keys.append(&mut keys);
         }
     }
 
-    return None;
+    return probable_keys;
 }
 
 pub fn encrypt_repeated(plaintext: &Vec<u8>, key: &Vec<u8>) -> Vec<u8> {

@@ -17,7 +17,7 @@ fn ch4() {
             for line in lines {
                 if let Ok(hex) = line {
                     let secret = HEXLOWER.decode(hex.as_bytes()).unwrap();
-                    xor::decrypt_single_byte(&secret);
+                    xor::decrypt_single_byte(&secret, 1);
                 }
             }
         },

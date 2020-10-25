@@ -2,6 +2,7 @@
 
 use data_encoding::{BASE64, HEXLOWER};
 use ordered_float::OrderedFloat;
+use permutate::{Permutator};
 use std::collections::{BTreeMap, BTreeSet};
 use std::env;
 use transpose::transpose;
@@ -124,7 +125,7 @@ fn get_keysize(secret: &Vec<u8>) -> usize {
     return keysize;
 }
 
-fn pick_repeating_key(secret: &Vec<u8>) -> Vec<u8> {
+fn pick_repeating_key(secret: &Vec<u8>) -> Vec<Vec<char>> {
     let keysize = 3;
     // let byte_count = keysize * (keysize * 14);
     // let keysize = get_keysize(&secret);
@@ -140,16 +141,46 @@ fn pick_repeating_key(secret: &Vec<u8>) -> Vec<u8> {
     println!("Bytes: {:02x?}", &m);
     println!("Trans: {:02x?}\n", &blocks);
 
-    let mut key: Vec<u8> = vec![];
+    let mut keys: Vec<Vec<char>> = vec![];
 
     for block in blocks.chunks(blocksize) {
         println!("Block: {:02x?}", &block);
-        if let Some(ch) = xor::decrypt_single_byte(&block.to_vec()) {
-            key.push(ch);
-        }
+        let ch: Vec<char> = xor::decrypt_single_byte(&block.to_vec(), 1);
+
+        keys.push(ch);
     }
 
-    return key;
+    return keys;
+}
+
+// See example on using permute: https://docs.rs/permutate/0.3.2/permutate/
+fn permute_keys(guessed_keys: Vec<Vec<char>>) -> Vec<String> {
+    // Convert the `Vec<Vec<char>>` into a `Vec<Vec<&str>>`
+    let str_vec: Vec<Vec<String>> = guessed_keys.iter()
+        .map(|list| list.iter().map(|ch| ch.to_string()).collect::<Vec<String>>())
+        .collect();
+
+    // Convert the `Vec<Vec<String>>` into a `Vec<Vec<&str>>`
+    let tmp: Vec<Vec<&str>> = str_vec.iter()
+        .map(|list| list.iter().map(AsRef::as_ref).collect::<Vec<&str>>())
+        .collect();
+
+    // Convert the `Vec<Vec<&str>>` into a `Vec<&[&str]>`
+    let vector_of_arrays: Vec<&[&str]> = tmp.iter()
+        .map(AsRef::as_ref).collect();
+
+    // Pass the `Vec<&[&str]>` as an `&[&[&str]]`
+    let permutator = Permutator::new(&vector_of_arrays[..]);
+    let mut keys = vec![];
+
+    // iteration 2: allocates a new buffer for each permutation
+    // you may opt to re-allocate or not (see iteration 1)
+    for key in permutator {
+        let str_key: String = key.join("");
+        keys.push(str_key);
+    }
+
+    return keys;
 }
 
 fn main() {
@@ -158,8 +189,23 @@ fn main() {
     println!("Ch6:");
     println!("Secret length: {:?}", &secret.len());
 
-    let key: Vec<u8> = pick_repeating_key(&secret);
-    let decrypted = xor::encrypt_repeated(&secret, &key);
-    println!("{:?}", ascii::print(decrypted));
-    println!("KEY: {:?}", String::from_utf8(key).unwrap());
+    let guessed_keys: Vec<Vec<char>> = pick_repeating_key(&secret);
+    println!("KEYS: {:#x?}", guessed_keys);
+
+    let keys = permute_keys(guessed_keys);
+    let mut texts: Vec<String> = vec![];
+
+    for key in keys {
+        let decrypted: &Vec<u8> = &xor::encrypt_repeated(&secret, &key.as_bytes().to_vec());
+        println!("KEY: {:#x?}: {:?}", key, ascii::print(decrypted.to_vec()));
+        texts.push(ascii::print(decrypted.to_vec()));
+    }
+
+    let metrics = text::most_english(&texts);
+    let mut metrics_iter = metrics.iter();
+    for _ in 0..24 {
+        if let Some((metric, text)) = metrics_iter.next_back() {
+            println!("{:?}: {:?}", metric.into_inner(), text);
+        }
+    }
 }

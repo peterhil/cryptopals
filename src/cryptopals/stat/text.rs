@@ -1,5 +1,7 @@
 #![allow(unused_variables)]
 
+use ordered_float::OrderedFloat;
+use std::collections::BTreeMap;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::iter::Sum;
@@ -27,6 +29,22 @@ pub fn englishness(text: &String) -> f64 {
     let metric: f64 = -l2_differences.values().product::<f64>().log2();
 
     return metric;
+}
+
+pub fn most_english(texts: &Vec<String>) -> BTreeMap<OrderedFloat<f64>, Vec<&String>> {
+    let mut metrics = BTreeMap::new();
+
+    texts
+        .iter()
+        .for_each(|text| {
+            let metric = englishness(&text);
+            metrics
+                .entry(OrderedFloat::<f64>::from(metric))
+                .or_insert(vec![])
+                .push(text);
+        });
+
+    return metrics;
 }
 
 pub fn hamming_distance(a: Vec<u8>, b: Vec<u8>) -> u64 {
