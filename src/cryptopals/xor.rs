@@ -63,15 +63,15 @@ pub fn decrypt_single_byte(secret: &Vec<u8>) -> Option<u8> {
             return Some(*keys.first().unwrap() as u8);
         }
     }
+
+    return None;
 }
 
-pub fn encrypt_repeated(plaintext: &str, key: &str) -> Vec<u8> {
-    let count: usize = (plaintext.len() as f64 / key.len() as f64).ceil() as usize;
-    let repeated = &key.repeat(count)[..plaintext.len()];
-
+pub fn encrypt_repeated(plaintext: &Vec<u8>, key: &Vec<u8>) -> Vec<u8> {
+    let repeated: Vec<u8> = key.iter().cloned().cycle().take(plaintext.len()).collect::<Vec<u8>>();
     let encrypted: Vec<u8> = xor_buffers(
-        &plaintext.as_bytes().to_vec(),
-        &repeated.as_bytes().to_vec()
+        &plaintext,
+        &repeated
     );
 
     return encrypted;
