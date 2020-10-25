@@ -33,7 +33,7 @@ pub fn metrics(secret: &Vec<u8>, letters: &Vec<u8>) -> BTreeMap<OrderedFloat<f64
             // Convert to string, lowercase the message and calculate metric
             match String::from_utf8(decoded.to_vec()) {
                 Ok(text) => {
-                    let metric = text::englishness(&text.to_lowercase());
+                    let metric = text::englishness(&text);
                     metrics
                         .entry(OrderedFloat::<f64>::from(metric))
                         .or_insert(BTreeMap::new())
