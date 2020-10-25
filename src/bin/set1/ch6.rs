@@ -99,16 +99,16 @@ fn read_bytes(full_path: String) -> Vec<u8> {
 }
 
 fn get_secret() -> Vec<u8> {
-    let plaintext = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
-    let key = "ICE";
-    let secret: Vec<u8> = xor::encrypt_repeated(&plaintext.as_bytes().to_vec(), &key.as_bytes().to_vec());
+    // let plaintext = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
+    // let key = "ICE";
+    // let secret: Vec<u8> = xor::encrypt_repeated(&plaintext.as_bytes().to_vec(), &key.as_bytes().to_vec());
     // let secret: Vec<u8> = BASE64.decode(b"HUIfTQsPAh9PE048GmllH0kcDk4TAQsHThsBFkU2AB4BSWQgVB0dQzNTTmVS").unwrap();
     // let secret: Vec<u8> = b"ICEICE Burning 'em, if you ain't quick and nimble".to_vec();
 
-    // let full_path = env::args().nth(1)
-    //     .ok_or(format!("Usage: {} data/6.txt", env::args().nth(0).unwrap()))
-    //     .unwrap_or_else(|e| exit_err(e, 1));
-    // let secret = read_bytes(full_path);
+    let full_path = env::args().nth(1)
+        .ok_or(format!("Usage: {} data/6.txt", env::args().nth(0).unwrap()))
+        .unwrap_or_else(|e| exit_err(e, 1));
+    let secret = read_bytes(full_path);
 
     return secret;
 }
@@ -126,7 +126,7 @@ fn get_keysize(secret: &Vec<u8>) -> usize {
 }
 
 fn pick_repeating_key(secret: &Vec<u8>) -> Vec<Vec<char>> {
-    let keysize = 3;
+    let keysize = 29;
     // let byte_count = keysize * (keysize * 14);
     // let keysize = get_keysize(&secret);
     let byte_count = keysize * (secret.len() / keysize);
@@ -198,7 +198,8 @@ fn main() {
     for key in keys {
         let decrypted: &Vec<u8> = &xor::encrypt_repeated(&secret, &key.as_bytes().to_vec());
         println!("KEY: {:#x?}: {:?}", key, ascii::print(decrypted.to_vec()));
-        texts.push(ascii::print(decrypted.to_vec()));
+        println!();
+        // texts.push(ascii::print(decrypted.to_vec()));
     }
 
     let metrics = text::most_english(&texts);
