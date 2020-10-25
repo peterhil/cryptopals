@@ -22,7 +22,7 @@ fn ch4() {
             }
         },
         Err(err) => {
-            println!("Error: {:?}", err);
+            exit_err(err, 2);
         },
     }
 }
