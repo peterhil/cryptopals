@@ -192,7 +192,8 @@ fn main() {
     let guessed_keys: Vec<Vec<char>> = pick_repeating_key(&secret);
     println!("KEYS: {:#x?}", guessed_keys);
 
-    let keys = permute_keys(guessed_keys);
+    let mut keys = permute_keys(guessed_keys);
+    keys.push("Terminator X: Bring the noise".to_string());
     let mut texts: Vec<String> = vec![];
 
     for key in keys {
@@ -204,9 +205,10 @@ fn main() {
 
     let metrics = text::most_english(&texts);
     let mut metrics_iter = metrics.iter();
-    for _ in 0..24 {
+    for _ in 0..2 {
         if let Some((metric, text)) = metrics_iter.next_back() {
             println!("{:?}: {:?}", metric.into_inner(), text);
+            println!();
         }
     }
 }
