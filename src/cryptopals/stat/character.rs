@@ -7,6 +7,9 @@ use std::collections::btree_map::BTreeMap;
 
 lazy_static! {
     pub static ref ENGLISH: HashMap<char, f64> = hashmap!{
+        ' ' => 0.17857,  // TODO Get more complete statistics for more characters!
+        '\'' => 0.02778,
+        '.' => 0.01389,
         'a' => 0.08167,
         'b' => 0.01492,
         'c' => 0.02782,
