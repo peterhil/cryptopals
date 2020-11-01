@@ -2,7 +2,7 @@
 
 use std::fmt::Display;
 use std::fs::File;
-use std::io::{self, BufRead, Read, Write};
+use std::io::{self, BufRead, BufReader, Lines, Read, Result, Write};
 use std::path::Path;
 use std::process;
 
@@ -14,7 +14,7 @@ pub fn exit_err<T>(msg: T, code: i32) -> ! where T: Display {
 
 // The output is wrapped in a Result to allow matching on errors
 // Returns an Iterator to the Reader of the lines of the file.
-pub fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
+pub fn read_lines<P>(filename: P) -> Result<Lines<BufReader<File>>>
 where P: AsRef<Path>, {
     let file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
