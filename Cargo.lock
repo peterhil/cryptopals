@@ -37,6 +37,7 @@ version = "0.1.0"
 dependencies = [
  "block-modes",
  "data-encoding",
+ "hex-literal",
  "lazy_static",
  "maplit",
  "ordered-float",
@@ -59,6 +60,12 @@ dependencies = [
  "typenum",
  "version_check",
 ]
+
+[[package]]
+name = "hex-literal"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5af1f635ef1bc545d78392b136bfe1c9809e029023c84a3638a864a10b8819c8"
 
 [[package]]
 name = "lazy_static"
