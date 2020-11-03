@@ -4,7 +4,6 @@ use aes::Aes128;
 use block_modes::{BlockMode, Ecb};
 use block_modes::block_padding::Pkcs7;
 use data_encoding::{BASE64};
-// use hex_literal::hex;
 use std::env;
 
 use cryptopals::ascii;
