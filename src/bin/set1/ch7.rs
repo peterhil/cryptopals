@@ -8,39 +8,22 @@ use data_encoding::{BASE64};
 use std::env;
 
 use cryptopals::ascii;
-use cryptopals::io::{exit_err, read_lines};
+use cryptopals::io::{exit_err, read_lines_by};
 
 // create an alias for convenience
 type Aes128Ecb = Ecb<Aes128, Pkcs7>;
 
-fn read_bytes(full_path: String) -> Vec<u8> {
-    let mut contents = vec![];
-
-    match read_lines(full_path) {
-        Ok(lines) => {
-            // Consumes the iterator, returns an (Optional) String
-            for line in lines {
-                if let Ok(base64) = line {
-                    let mut decoded = BASE64
-                        .decode(&base64.as_bytes()[..])
-                        .unwrap_or_else(|e| exit_err(e, 3));
-                    contents.append(&mut decoded);
-                }
-            }
-        },
-        Err(err) => {
-            exit_err(err, 2);
-        },
-    }
-
-    return contents;
+fn base64_decode(base64: &str) -> Vec<u8> {
+    return BASE64
+        .decode(&base64.as_bytes()[..])
+        .unwrap_or_else(|e| exit_err(e, 3));
 }
 
 fn get_secret() -> Vec<u8> {
     let full_path = env::args().nth(1)
         .ok_or(format!("Usage: {} data/7.txt", env::args().nth(0).unwrap()))
         .unwrap_or_else(|e| exit_err(e, 1));
-    let secret = read_bytes(full_path);
+    let secret = read_lines_by(&full_path, base64_decode).unwrap();
 
     return secret;
 }
