@@ -5,6 +5,7 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader, Error, Lines, Read, Result, Write};
 use std::path::Path;
 use std::process;
+use std::str::{self, FromStr};
 
 #[inline]
 pub fn exit_err<T>(msg: T, code: i32) -> ! where T: Display {
@@ -18,6 +19,20 @@ pub fn read_lines<P>(filename: P) -> Result<Lines<BufReader<File>>>
 where P: AsRef<Path>, {
     let file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
+}
+
+// Calls *func()* on each line
+pub fn read_iter<T>(file_name: &str, func: fn(&str) -> Result<Vec<T>>) -> Vec<Result<Vec<T>>> {
+    let file = File::open(file_name).unwrap_or_else(|e| exit_err(e, 2));
+    let reader = BufReader::new(file);
+    let mut result = vec![];
+
+    for line in reader.lines() {
+        let res = func(&line.unwrap());
+        result.push(res);
+    }
+
+    return result;
 }
 
 // Reuse the same String buffer

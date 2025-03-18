@@ -55,3 +55,7 @@ path = "src/bin/set1/ch6.rs"
 [[bin]]
 name = "s1c7"
 path = "src/bin/set1/ch7.rs"
+
+[[bin]]
+name = "s1c8"
+path = "src/bin/set1/ch8.rs"
