@@ -14,9 +14,9 @@ data-encoding = "2.3.0"
 hex-literal = "0.3.1"
 lazy_static = "1.4.0"
 maplit = "1.0.2"
-ordered-float = "2.0.0"
+ordered-float = "2.0.1"
 permutate = "0.3.2"
-transpose = "0.2.0"
+transpose = "0.2.3"
 
 [[bin]]
 name = "cryptopals"
