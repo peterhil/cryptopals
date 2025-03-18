@@ -1,6 +1,6 @@
 #![warn(clippy::all, rust_2018_idioms)]
 
-use data_encoding::{BASE64, HEXLOWER};
+use data_encoding::BASE64;
 use ordered_float::OrderedFloat;
 use permutate::{Permutator};
 use std::collections::{BTreeMap, BTreeSet};
@@ -177,7 +177,7 @@ fn main() {
 
     let mut keys = permute_keys(guessed_keys);
     keys.push("Terminator X: Bring the noise".to_string());
-    let mut texts: Vec<String> = vec![];
+    let texts: Vec<String> = vec![];
 
     for key in keys {
         let decrypted: &Vec<u8> = &xor::encrypt_repeated(&secret, &key.as_bytes().to_vec());
